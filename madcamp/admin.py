@@ -2,6 +2,7 @@ from django.contrib import admin
 from madcamp.models import *
 
 # Register your models here.
+admin.site.register(User)
 admin.site.register(Place)
 admin.site.register(Schedule)
 admin.site.register(Travel)
