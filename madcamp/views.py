@@ -18,11 +18,19 @@ class NotificationView(viewsets.ModelViewSet):
     permission_classes = [IsAuthenticated,]
     # permission_classes = [permissions.AllowAny,]
 
-@api_view(['GET'])
+@api_view(['POST'])
 @permission_classes([AllowAny])
 def checkUser(request):
-    if request.method == 'GET':
+    if request.method == 'POST':
+        if User.objects.filter(email=request.data['email']).first() is None:
+            request.data['status'] = "False"
+        else:
+            request.data['status'] = "True"
+
         serializer = CheckUserSerializer(data=request.data)
+        if not serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, 409)
+
         return Response(serializer.data, 200)
 
 @api_view(['POST'])
@@ -31,13 +39,11 @@ def createUser(request):
     if request.method == 'POST':
         serializer = UserCreateSerializer(data=request.data)
         if not serializer.is_valid(raise_exception=True):
-            print("here")
             return Response(serializer.data, 409)
 
         if User.objects.filter(email=serializer.validated_data['email']).first() is None:
             serializer.save()
             return Response(serializer.data, 201)
-        print("here22")
         return Response(serializer.data, 409)
 
 

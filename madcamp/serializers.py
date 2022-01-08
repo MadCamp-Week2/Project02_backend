@@ -49,16 +49,9 @@ class UserCreateSerializer(serializers.Serializer):
         user.save()
         return user
 
-class CheckUserSerializer(serializer.Serializer):
+class CheckUserSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     status = serializers.CharField(max_length=64)
-
-    def create(self, validated_data):
-        email=validated_data['email']
-        if User.objects.filter(email=validated_data['email']).first() is None:
-            status = "False"
-        else:
-            status = "True"
 
 
 class UserLoginSerializer(serializers.Serializer):
