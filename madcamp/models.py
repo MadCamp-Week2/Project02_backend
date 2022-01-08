@@ -31,6 +31,7 @@ class Travel(models.Model):
 
 class Schedule(models.Model):
     travel = models.ForeignKey(Travel, on_delete=models.CASCADE, null = True)
+    day = models.PositiveIntegerField(null=False) # might be idx+1
     money = models.PositiveIntegerField(null=False)
     memo = models.CharField(max_length=100, null=True)
     start_datetime = models.DateTimeField(null=True)

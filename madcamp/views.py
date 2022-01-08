@@ -8,8 +8,6 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.http.response import HttpResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from django.views.decorators.csrf import csrf_exempt
-import uuid
 
 # Create your views here.
 class NotificationView(viewsets.ModelViewSet):
@@ -59,3 +57,16 @@ def login(request):
             return Response(serializer.data, 200)
 
         return Response(serializer.data, 200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_travel(request):
+    if request.method == 'POST':
+        serializer = TravelSerializer(data=request.data)
+        print(request.data)
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+
+        serializer.save()
+        print(serializer.data)
+        return Response(serializer.data, 201)

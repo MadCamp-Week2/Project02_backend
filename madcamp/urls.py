@@ -2,7 +2,7 @@
 from django.urls import path, include
 from rest_framework.urlpatterns import format_suffix_patterns
 from . import views
-from .views import NotificationView
+from .views import *
 
 test_list = NotificationView.as_view({
     'post': 'create',
@@ -15,4 +15,5 @@ urlpatterns = format_suffix_patterns([
     path('signup/', views.createUser),
     path('login/', views.login),
     path('check/', views.checkUser),
+    path('travels/', views.add_travel),
 ])

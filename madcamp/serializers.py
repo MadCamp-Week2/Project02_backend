@@ -4,6 +4,8 @@ from django.contrib.auth import get_user_model
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth import authenticate
 from .models import *
+import datetime
+
 
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
@@ -41,9 +43,7 @@ class UserCreateSerializer(serializers.Serializer):
     password = serializers.CharField(required=True)
 
     def create(self, validated_data):
-        user = User.objects.create(
-            email=validated_data['email'],
-        )
+        user = User.objects.create(email=validated_data['email'],)
         user.set_password(validated_data['password'])
 
         user.save()
@@ -79,3 +79,22 @@ class UserLoginSerializer(serializers.Serializer):
             'email': user.email,
             'token': jwt_token
         }
+
+
+class TravelSerializer(serializers.Serializer):
+    title = serializers.CharField(max_length=64)
+    place_name = serializers.CharField(max_length=64)
+    start_year = serializers.IntegerField()
+    start_month = serializers.IntegerField()
+    start_day = serializers.IntegerField()
+    end_year = serializers.IntegerField()
+    end_month = serializers.IntegerField()
+    end_day = serializers.IntegerField()
+
+    def create(self, validated_data):
+        start_date_fd = datetime.date(validated_data['start_year'], validated_data['start_month'], validated_data['start_day'])
+        end_date_fd = datetime.date(validated_data['end_year'], validated_data['end_month'], validated_data['end_day'])
+
+        travel = Travel.objects.create(title=validated_data['title'], place_name=validated_data['place_name'], start_date=start_date_fd, end_date=end_date_fd)
+        travel.save()
+        return validated_data;
