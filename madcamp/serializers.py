@@ -82,6 +82,7 @@ class UserLoginSerializer(serializers.Serializer):
 
 
 class TravelSerializer(serializers.Serializer):
+    travel_id = serializers.IntegerField()
     title = serializers.CharField(max_length=64)
     place_name = serializers.CharField(max_length=64)
     start_year = serializers.IntegerField()
@@ -97,4 +98,6 @@ class TravelSerializer(serializers.Serializer):
 
         travel = Travel.objects.create(title=validated_data['title'], place_name=validated_data['place_name'], start_date=start_date_fd, end_date=end_date_fd)
         travel.save()
+
+        validated_data['travel_id'] = travel.id
         return validated_data;
