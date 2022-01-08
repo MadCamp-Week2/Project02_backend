@@ -13,5 +13,5 @@ urlpatterns = format_suffix_patterns([
     path('auth/', include('rest_framework.urls', namespace='rest_framework')),
     path('test/', test_list, name='test_list'),
     path('signup/', views.createUser),
-    path('login/', views.login)
+    path('login/', views.login),
 ])

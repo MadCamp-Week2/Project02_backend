@@ -1,3 +1,4 @@
+from django.contrib import auth
 from django.shortcuts import render
 from rest_framework import viewsets
 from .serializers import *
@@ -8,7 +9,7 @@ from rest_framework.response import Response
 from django.http.response import HttpResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
 from rest_framework_jwt.authentication import JSONWebTokenAuthentication
-
+import uuid
 
 # Create your views here.
 class NotificationView(viewsets.ModelViewSet):
