@@ -47,8 +47,4 @@ def login(request):
         if serializer.validated_data['email'] == "None":
             return Response(serializer.data, 200)
 
-        # response = {
-        #     'success': 'True',
-        #     'token': serializer.data['token']
-        # }
         return Response(serializer.data, 200)
