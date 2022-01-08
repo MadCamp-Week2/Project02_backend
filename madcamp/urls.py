@@ -14,4 +14,5 @@ urlpatterns = format_suffix_patterns([
     path('test/', test_list, name='test_list'),
     path('signup/', views.createUser),
     path('login/', views.login),
+    path('check/', views.checkUser),
 ])

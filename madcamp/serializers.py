@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from rest_framework_jwt.settings import api_settings
+from rest_framework_simplejwt.tokens import RefreshToken
 from django.contrib.auth import get_user_model
 from django.contrib.auth.models import update_last_login
 from django.contrib.auth import authenticate
@@ -18,6 +18,7 @@ class NotificationSerializer(serializers.ModelSerializer):
         # fields = ('id', 'title', 'content', 'creator', 'datetime')
         fields = ('id', 'title', 'content')
 
+#might be redundant
 class AccountInfoSerializer(serializers.Serializer):
     email = serializers.EmailField()
     name = serializers.CharField()
@@ -48,9 +49,16 @@ class UserCreateSerializer(serializers.Serializer):
         user.save()
         return user
 
+class CheckUserSerializer(serializer.Serializer):
+    email = serializers.EmailField(required=True)
+    status = serializers.CharField(max_length=64)
 
-JWT_PAYLOAD_HANDLER = api_settings.JWT_PAYLOAD_HANDLER
-JWT_ENCODE_HANDLER = api_settings.JWT_ENCODE_HANDLER
+    def create(self, validated_data):
+        email=validated_data['email']
+        if User.objects.filter(email=validated_data['email']).first() is None:
+            status = "False"
+        else:
+            status = "True"
 
 
 class UserLoginSerializer(serializers.Serializer):
@@ -68,8 +76,7 @@ class UserLoginSerializer(serializers.Serializer):
                 'email': 'None'
             }
         try:
-            payload = JWT_PAYLOAD_HANDLER(user)
-            jwt_token = JWT_ENCODE_HANDLER(payload)
+            jwt_token = RefreshToken.for_user(user).access_token
             update_last_login(None, user)
         except User.DoesNotExist:
             raise serializers.ValidationError(

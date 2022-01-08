@@ -8,7 +8,7 @@ from rest_framework.decorators import api_view, permission_classes
 from rest_framework.response import Response
 from django.http.response import HttpResponse
 from rest_framework.permissions import AllowAny, IsAuthenticated
-from rest_framework_jwt.authentication import JSONWebTokenAuthentication
+from django.views.decorators.csrf import csrf_exempt
 import uuid
 
 # Create your views here.
@@ -16,9 +16,14 @@ class NotificationView(viewsets.ModelViewSet):
     queryset = Notification.objects.all()
     serializer_class = NotificationSerializer
     permission_classes = [IsAuthenticated,]
-    authentication_classes = [JSONWebTokenAuthentication]
     # permission_classes = [permissions.AllowAny,]
 
+@api_view(['GET'])
+@permission_classes([AllowAny])
+def checkUser(request):
+    if request.method == 'GET':
+        serializer = CheckUserSerializer(data=request.data)
+        return Response(serializer.data, 200)
 
 @api_view(['POST'])
 @permission_classes([AllowAny])
