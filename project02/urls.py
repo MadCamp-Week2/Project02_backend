@@ -18,9 +18,5 @@ from django.urls import path, include
 
 urlpatterns = [
     path('admin/', admin.site.urls),
-    path('madcamp/', include('madcamp.urls')),
-    path('social/', include('dj_rest_auth.urls')),
-    path('social/', include('dj_rest_auth.registration.urls')),
-    path('social/', include('allauth.urls')),
-    # path('social/', include('social.urls')),
+    path('madcamp/', include('madcamp.urls'))
 ]
