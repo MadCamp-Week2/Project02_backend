@@ -12,6 +12,10 @@ class UserSerializer(serializers.ModelSerializer):
         model = User
         fields = ('id', 'username', 'email')
 
+class PlaceSerializer(serializers.ModelSerializer):
+    name = serializers.CharField()
+    address = serializers.CharField()
+
 class NotificationSerializer(serializers.ModelSerializer):
     # creator = UserSerializer(read_only=True)
 
@@ -128,4 +132,45 @@ class userTravelSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     travel_list = getTravelSerializer(many=True)
 
-    
+class newScheduleSeralizer(serializers.Serializer):
+    travel_id = serializers.IntegerField()
+    day = serializers.IntegerField()
+    money = serializers.IntegerField()
+    memo = serializers.CharField()
+    start_hour = serializers.IntegerField()
+    start_minute = serializers.IntegerField()
+    end_hour = serializers.IntegerField()
+    end_minute = serializers.IntegerField()
+    place_name = serializers.CharField()
+    place_address = serializers.CharField()
+    schedule_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        start_time = datetime.time(hour=validated_data['start_hour'], minute=validated_data['start_minute'])
+        end_time = datetime.time(hour=validated_data['end_hour'], minute=validated_data['end_minute'])
+        
+        if Place.objects.filter(name=validated_data['place_name']).first() is None:
+            place = Place.objects.create(name=validated_data['place_name'], address=validated_data['place_address'])
+            place.save()
+
+        place = Place.objects.filter(name=validated_data['place_name']).first()
+        place.address = validated_data['place_address']
+        place.save()
+
+        travel = Travel.objects.filter(id=validated_data['travel_id']).first()
+        
+        if validated_data['schedule_id'] == -1 or Schedule.objects.get(id=validated_data['schedule_id']) is None:
+            schedule = Schedule.objects.create(travel=travel, day=validated_data['day'], money=validated_data['money'], memo=validated_data['memo'], start_datetime=start_time, end_datetime=end_time, place=place)
+        else:
+            schedule = Schedule.objects.get(id=validated_data['schedule_id'])
+            schedule.money = validated_data['money']
+            schedule.memo = validated_data['memo']
+            schedule.start_datetime = start_time
+            schedule.end_datetime = end_time
+            schedule.place = place
+        
+        schedule.save()
+
+        validated_data['schedule_id'] = schedule.id
+        return validated_data
+

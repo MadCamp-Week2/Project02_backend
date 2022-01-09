@@ -20,8 +20,8 @@ class User(AbstractUser):
 class Place(models.Model):
     name = models.CharField(max_length=200, null=True)
     address = models.CharField(max_length=200, null=True)
-    latitude = models.FloatField()
-    longitude = models.FloatField()
+    #latitude = models.FloatField()
+    #longitude = models.FloatField()
 
 class Travel(models.Model):
     title = models.CharField(max_length=50, null=True)
@@ -34,8 +34,8 @@ class Schedule(models.Model):
     day = models.PositiveIntegerField(null=False, default=1) # might be idx+1
     money = models.PositiveIntegerField(null=False)
     memo = models.CharField(max_length=100, null=True)
-    start_datetime = models.DateTimeField(null=True)
-    end_datetime = models.DateTimeField(null=True)
+    start_datetime = models.TimeField(null=True)
+    end_datetime = models.TimeField(null=True)
     place = models.ForeignKey(Place, on_delete=models.SET_NULL, null=True)
 
 class Profile(models.Model):

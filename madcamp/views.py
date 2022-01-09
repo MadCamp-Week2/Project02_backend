@@ -71,7 +71,7 @@ def add_travel(request):
             return Response(serializer.data, 409)
 
         serializer.save()
-        print(serializer.data)
+        # print(serializer.data)
         return Response(serializer.data, 201)
 
 @api_view(['GET'])
@@ -87,11 +87,25 @@ def get_travel(request):
         for travel in profile.travels.all():
             travel_list.append({"travel_id":travel.id, "title":travel.title, "place_name":travel.place_name, "start_year":travel.start_date.year, "start_month":travel.start_date.month, "start_day":travel.start_date.day, "end_year":travel.end_date.year, "end_month":travel.end_date.month, "end_day":travel.end_date.day})
         
-        print(travel_list)
+        # print(travel_list)
         serializer = userTravelSerializer(data={'email':email, 'travel_list':travel_list})
-        print(serializer.initial_data)
+        # print(serializer.initial_data)
 
         if not serializer.is_valid(raise_exception=False):
             return Response(serializer.data, 409)
 
         return Response(serializer.data, 200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def new_schedule(request):
+    if request.method == 'POST':
+        print(request.data)
+        serializer = newScheduleSeralizer(data=request.data)
+
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+        
+        serializer.save()
+        return Response(serializer.data, 201)
+        
