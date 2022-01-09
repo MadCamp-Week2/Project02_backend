@@ -66,7 +66,7 @@ def login(request):
 def add_travel(request):
     if request.method == 'POST':
         serializer = TravelSerializer(data=request.data)
-        print(request.data)
+        # print(request.data)
         if not serializer.is_valid(raise_exception=False):
             return Response(serializer.data, 409)
 
@@ -103,7 +103,7 @@ def get_travel(request):
 @permission_classes([IsAuthenticated])
 def new_schedule(request):
     if request.method == 'POST':
-        print(request.data)
+        # print(request.data)
         serializer = newScheduleSeralizer(data=request.data)
 
         if not serializer.is_valid(raise_exception=False):
@@ -111,4 +111,16 @@ def new_schedule(request):
         
         serializer.save()
         return Response(serializer.data, 201)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def del_schedule(request):
+    if request.method == 'POST':
+        # print(request.data)
+        del_id = request.data
+        if del_id is None or del_id < 0 or Schedule.objects.filter(id = del_id).first() is None:
+            return Response(request.data, 409)
         
+        Schedule.objects.filter(id = del_id).delete()
+
+        return Response(request.data, 200)
