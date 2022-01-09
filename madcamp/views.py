@@ -85,7 +85,10 @@ def get_travel(request):
         profile = Profile.objects.get(user=user)
         travel_list = []
         for travel in profile.travels.all():
-            travel_list.append({"travel_id":travel.id, "title":travel.title, "place_name":travel.place_name, "start_year":travel.start_date.year, "start_month":travel.start_date.month, "start_day":travel.start_date.day, "end_year":travel.end_date.year, "end_month":travel.end_date.month, "end_day":travel.end_date.day})
+            schedule_list = []
+            for schedule in Schedule.objects.filter(travel=travel):
+                schedule_list.append({"travel_id":travel.id, "day":schedule.day, "money":schedule.money, "memo":schedule.memo, "start_hour":schedule.start_datetime.hour, "start_minute":schedule.start_datetime.minute, "end_hour":schedule.end_datetime.hour, "end_minute":schedule.end_datetime.minute, "place_name":schedule.place.name, "place_address":schedule.place.address, "schedule_id":schedule.id})
+            travel_list.append({"travel_id":travel.id, "title":travel.title, "place_name":travel.place_name, "start_year":travel.start_date.year, "start_month":travel.start_date.month, "start_day":travel.start_date.day, "end_year":travel.end_date.year, "end_month":travel.end_date.month, "end_day":travel.end_date.day, "schedule_list":schedule_list})
         
         # print(travel_list)
         serializer = userTravelSerializer(data={'email':email, 'travel_list':travel_list})

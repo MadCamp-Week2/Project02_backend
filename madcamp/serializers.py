@@ -117,26 +117,12 @@ class TravelSerializer(serializers.Serializer):
         validated_data['travel_id'] = travel.id
         return validated_data
 
-class getTravelSerializer(serializers.Serializer):
-    travel_id = serializers.IntegerField(required=True)
-    title = serializers.CharField(max_length=64)
-    place_name = serializers.CharField(max_length=64)
-    start_year = serializers.IntegerField()
-    start_month = serializers.IntegerField()
-    start_day = serializers.IntegerField()
-    end_year = serializers.IntegerField()
-    end_month = serializers.IntegerField()
-    end_day = serializers.IntegerField()
-
-class userTravelSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    travel_list = getTravelSerializer(many=True)
 
 class newScheduleSeralizer(serializers.Serializer):
     travel_id = serializers.IntegerField()
     day = serializers.IntegerField()
     money = serializers.IntegerField()
-    memo = serializers.CharField()
+    memo = serializers.CharField(allow_null=True, allow_blank=True)
     start_hour = serializers.IntegerField()
     start_minute = serializers.IntegerField()
     end_hour = serializers.IntegerField()
@@ -173,4 +159,23 @@ class newScheduleSeralizer(serializers.Serializer):
 
         validated_data['schedule_id'] = schedule.id
         return validated_data
+
+
+class getTravelSerializer(serializers.Serializer):
+    travel_id = serializers.IntegerField(required=True)
+    title = serializers.CharField(max_length=64)
+    place_name = serializers.CharField(max_length=64)
+    start_year = serializers.IntegerField()
+    start_month = serializers.IntegerField()
+    start_day = serializers.IntegerField()
+    end_year = serializers.IntegerField()
+    end_month = serializers.IntegerField()
+    end_day = serializers.IntegerField()
+    schedule_list = newScheduleSeralizer(many=True)
+
+
+class userTravelSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    travel_list = getTravelSerializer(many=True)
+
 
