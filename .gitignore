@@ -1,3 +1,4 @@
 madcamp/__pycache__/
 madcamp/migrations/
 project02/__pycache__/
+*.sqlite3
