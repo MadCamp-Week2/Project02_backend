@@ -43,7 +43,7 @@ class Profile(models.Model):
     name = models.CharField(max_length=50, null=True)
     travels = models.ManyToManyField(Travel)
     friends = models.ManyToManyField("Profile", blank=True)
-    photo = models.ImageField(blank=True, null=True)
+    photo = models.CharField(blank=True, null=True, max_length=100)
 
     def get_connections(self):
         connections = Connection.objects.filter(creator=self.user)
