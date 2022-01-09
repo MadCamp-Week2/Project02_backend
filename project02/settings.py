@@ -135,14 +135,14 @@ AUTH_USER_MODEL = 'madcamp.User'
 
 REST_FRAMEWORK = {
     'DEFAULT_PERMISSION_CLASSES': (
-        'rest_framework.permissions.IsAuthenticated', # ì¸ì¦ëœ ì‚¬ìš©ìë§Œ ì ‘ê·¼ ê°€ëŠ¥
-        'rest_framework.permissions.IsAdminUser', # ê´€ë¦¬ìë§Œ ì ‘ê·¼ ê°€ëŠ¥
-        'rest_framework.permissions.AllowAny', # ëˆ„êµ¬ë‚˜ ì ‘ê·¼ ê°€ëŠ¥
+        'rest_framework.permissions.IsAuthenticated', # ?¸ì¦ëœ ?‚¬?š©?ë§? ? ‘ê·? ê°??Š¥
+        'rest_framework.permissions.IsAdminUser', # ê´?ë¦¬ìë§? ? ‘ê·? ê°??Š¥
+        'rest_framework.permissions.AllowAny', # ?ˆ„êµ¬ë‚˜ ? ‘ê·? ê°??Š¥
 
     ),
 
     'DEFAULT_RENDERER_CLASSES': (
-        # ìë™ìœ¼ë¡œ jsonìœ¼ë¡œ ë°”ê¿”ì¤Œ
+        # ??™?œ¼ë¡? json?œ¼ë¡? ë°”ê¿”ì¤?
         'rest_framework.renderers.JSONRenderer',
         'rest_framework.renderers.BrowsableAPIRenderer',
     ),
@@ -159,11 +159,11 @@ import datetime
 
 # JWT_AUTH = {
 #     'JWT_SECRET_KEY': SECRET_KEY,
-#     'JWT_ALGORITHM': 'HS256', # ì•”í˜¸í™” ì•Œê³ ë¦¬ì¦˜
-#     'JWT_ALLOW_REFRESH': True, # refresh ì‚¬ìš© ì—¬ë¶€
-#     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7), # ìœ íš¨ê¸°ê°„ ì„¤ì •
-#     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28), # JWT í† í° ê°±ì‹  ìœ íš¨ê¸°ê°„
-#     # import datetime ìƒë‹¨ì— import í•˜ê¸°
+#     'JWT_ALGORITHM': 'HS256', # ?•”?˜¸?™” ?•Œê³ ë¦¬ì¦?
+#     'JWT_ALLOW_REFRESH': True, # refresh ?‚¬?š© ?—¬ë¶?
+#     'JWT_EXPIRATION_DELTA': datetime.timedelta(days=7), # ?œ ?š¨ê¸°ê°„ ?„¤? •
+#     'JWT_REFRESH_EXPIRATION_DELTA': datetime.timedelta(days=28), # JWT ?† ?° ê°±ì‹  ?œ ?š¨ê¸°ê°„
+#     # import datetime ?ƒ?‹¨?— import ?•˜ê¸?
 #     'JWT_AUTH_HEADER_PREFIX': 'Bearer',
 #     'JWT_AUTH_COOKIE': None,
 # }

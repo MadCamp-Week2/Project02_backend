@@ -111,4 +111,21 @@ class TravelSerializer(serializers.Serializer):
         profile.travels.add(travel)
 
         validated_data['travel_id'] = travel.id
-        return validated_data;
+        return validated_data
+
+class getTravelSerializer(serializers.Serializer):
+    travel_id = serializers.IntegerField(required=True)
+    title = serializers.CharField(max_length=64)
+    place_name = serializers.CharField(max_length=64)
+    start_year = serializers.IntegerField()
+    start_month = serializers.IntegerField()
+    start_day = serializers.IntegerField()
+    end_year = serializers.IntegerField()
+    end_month = serializers.IntegerField()
+    end_day = serializers.IntegerField()
+
+class userTravelSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    travel_list = getTravelSerializer(many=True)
+
+    
