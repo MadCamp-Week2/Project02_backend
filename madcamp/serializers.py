@@ -198,13 +198,18 @@ class FriendRequestSerializer(serializers.Serializer):
         from_user = User.objects.filter(email=validated_data['from_user_email']).first()
         to_user = User.objects.filter(email=validated_data['to_user_email']).first()
         
+        from_user_profile = Profile.objects.get(user=from_user)
+
         if to_user is None:
             validated_data['status'] = 'False'
         elif from_user.id == to_user.id:
-            validated_data['status']  = 'Self'
+            validated_data['status'] = 'Self'
+        elif from_user_profile.pending_requests.all().filter(user=to_user).first() is not None:
+            validated_data['status'] = 'Duplicated'
+        elif from_user_profile.friends.all().filter(user=to_user).first() is not None:
+            validated_data['status'] = 'Already'
         else:
             validated_data['status']  = 'True'
-            from_user_profile = Profile.objects.get(user=from_user)
             to_user_profile = Profile.objects.get(user=to_user)
             to_user_profile.pending_requests.add(from_user_profile)
         
