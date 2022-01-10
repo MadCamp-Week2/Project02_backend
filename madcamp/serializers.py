@@ -179,3 +179,53 @@ class updateTravelSerializer(serializers.Serializer):
         travel.save()
 
         return validated_data
+
+class FriendSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    email = serializers.EmailField()
+    photo = serializers.CharField()
+
+class getFriendsSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    friend_list = FriendSerializer(many=True)
+
+class FriendRequestSerializer(serializers.Serializer):
+    from_user_email = serializers.EmailField()
+    to_user_email = serializers.EmailField()
+    status = serializers.CharField()
+
+    def create(self, validated_data):
+        from_user = User.objects.filter(email=validated_data['from_user_email']).first()
+        to_user = User.objects.filter(email=validated_data['to_user_email']).first()
+        
+        if to_user is None:
+            validated_data['status'] = 'False'
+        elif from_user.id == to_user.id:
+            validated_data['status']  = 'Self'
+        else:
+            validated_data['status']  = 'True'
+            from_user_profile = Profile.objects.get(user=from_user)
+            to_user_profile = Profile.objects.get(user=to_user)
+            to_user_profile.pending_requests.add(from_user_profile)
+        
+        return validated_data
+
+class FriendAddorIgnoreRequestSerializer(serializers.Serializer):
+    from_user_email = serializers.EmailField()
+    to_user_email = serializers.EmailField()
+    status = serializers.CharField()
+
+    def create(self, validated_data):
+        from_user = User.objects.filter(email=validated_data['from_user_email']).first()
+        to_user = User.objects.filter(email=validated_data['to_user_email']).first()
+        
+        from_user_profile = Profile.objects.get(user=from_user)
+        to_user_profile = Profile.objects.get(user=to_user)
+        
+        to_user_profile.pending_requests.remove(from_user_profile) #remove relation from many to many field
+        
+        if validated_data['status'] == 'ACCEPT':
+            to_user_profile.friends.add(from_user_profile)
+            from_user_profile.friends.add(to_user_profile)
+
+        return validated_data

@@ -84,6 +84,7 @@ def get_travel(request):
         # print(user)
         profile = Profile.objects.get(user=user)
         travel_list = []
+        # print(profile.travels.all())
         for travel in profile.travels.all():
             schedule_list = []
             for schedule in Schedule.objects.filter(travel=travel):
@@ -142,11 +143,81 @@ def update_travel(request):
 @permission_classes([IsAuthenticated])
 def del_travel(request):
     if request.method == 'POST':
-        print(request.data)
         del_id = request.data
-        if del_id is None or del_id < 0 or Schedule.objects.filter(id = del_id).first() is None:
+        if del_id is None or del_id < 0 or Travel.objects.filter(id = del_id).first() is None:
             return Response(request.data, 409)
         
         Travel.objects.filter(id = del_id).delete()
 
         return Response(request.data, 200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_friends(request):
+    if request.method == 'GET':
+        email = request.query_params.get('params1',None)
+        
+        if email is None or User.objects.filter(email=email).first() is None:
+            return Response({'email':email, friend_list:[]}, 409)
+        
+        from_user = User.objects.filter(email=email).first()
+        friend_list = []
+        
+        for friend in Profile.objects.get(user=from_user).friends.all():
+            friend_list.append({'username':friend.name, 'email':friend.user.email, 'photo':friend.photo})
+        
+        serializer = getFriendsSerializer(data={'email':email, 'friend_list':friend_list})
+        
+        if not serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, 409)
+        
+        return Response(serializer.data, 200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_friend_requests(request):
+    if request.method == 'GET':
+        email = request.query_params.get('params1',None)
+        if email is None or User.objects.filter(email=email).first() is None:
+            return Response({'email':email, friend_list:[]}, 409)
+
+        from_user = User.objects.filter(email=email).first()
+        friend_request_list = []
+
+        for friend_request in Profile.objects.get(user=from_user).pending_requests.all():
+            friend_request_list.append({'username':friend_request.name, 'email':friend_request.user.email, 'photo':friend_request.photo})
+
+        serializer = getFriendsSerializer(data={'email':email, 'friend_list':friend_request_list})
+
+        if not serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, 409)
+
+        return Response(serializer.data, 200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def post_friend_request(request):
+    if request.method == 'POST':
+        serializer = FriendRequestSerializer(data=request.data)
+
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+        
+        serializer.save()
+
+        return Response(serializer.data, 201)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_or_ignore_friend(request):
+    if request.method == "POST":
+        serializer = FriendAddorIgnoreRequestSerializer(data=request.data)
+        
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+        
+        serializer.save()
+
+        return Response(serializer.data, 201)
+
+        

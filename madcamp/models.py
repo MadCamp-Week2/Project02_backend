@@ -41,17 +41,10 @@ class Schedule(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=50, null=True)
-    travels = models.ManyToManyField(Travel)
-    friends = models.ManyToManyField("Profile", blank=True)
+    travels = models.ManyToManyField(Travel, blank=True)
+    friends = models.ManyToManyField("Profile", related_name="friends_set", blank=True)
+    pending_requests = models.ManyToManyField("Profile", related_name="pending_set", blank=True)
     photo = models.CharField(blank=True, null=True, max_length=100)
-
-    def get_connections(self):
-        connections = Connection.objects.filter(creator=self.user)
-        return connections
-
-    def get_followers(self):
-        followers = Connection.objects.filter(following=self.user)
-        return followers
 
 class Review(models.Model):
     travel = models.ForeignKey(Travel, on_delete=models.CASCADE, null = True)
@@ -66,9 +59,3 @@ class Notification(models.Model):
     # datetime = models.DateTimeField(null = True)
     title = models.CharField(max_length=100, null=True)
     content = models.CharField(max_length=100, null=True)
-
-class Connection(models.Model):
-    created = models.DateTimeField(auto_now_add=True, editable=False)
-    creator = models.ForeignKey(User, related_name="friendship_creator_set", on_delete=models.CASCADE)
-    following = models.ForeignKey(User, related_name="friend_set", on_delete=models.CASCADE)
-    accepted = models.BooleanField(default=False)
