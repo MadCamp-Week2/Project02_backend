@@ -24,22 +24,6 @@ class NotificationSerializer(serializers.ModelSerializer):
         # fields = ('id', 'title', 'content', 'creator', 'datetime')
         fields = ('id', 'title', 'content')
 
-#might be redundant
-class AccountInfoSerializer(serializers.Serializer):
-    email = serializers.EmailField()
-    name = serializers.CharField()
-
-    def save(self):
-        email = self.validated_data['email']
-        name = self.validated_data['name']
-        user = User()
-        user.email = email
-        user.save()
-        profile = Profile()
-        profile.name = name
-        profile.save()
-
-
 User = get_user_model()
 
 class UserCreateSerializer(serializers.Serializer):
@@ -160,7 +144,6 @@ class newScheduleSeralizer(serializers.Serializer):
         validated_data['schedule_id'] = schedule.id
         return validated_data
 
-
 class getTravelSerializer(serializers.Serializer):
     travel_id = serializers.IntegerField(required=True)
     title = serializers.CharField(max_length=64)
@@ -179,3 +162,20 @@ class userTravelSerializer(serializers.Serializer):
     travel_list = getTravelSerializer(many=True)
 
 
+class updateTravelSerializer(serializers.Serializer):
+    travel_id = serializers.IntegerField(required=True)
+    title = serializers.CharField()
+    place_name = serializers.CharField()
+
+    def create(self, validated_data):
+        if validated_data['travel_id'] < 0 or Travel.objects.get(id = validated_data['travel_id']) is None:
+            raise serializers.ValidationError(
+                'According Travel object does not exist!'
+            )
+        travel = Travel.objects.get(id = validated_data['travel_id'])
+        
+        travel.title = validated_data['title']
+        travel.place_name = validated_data['place_name']
+        travel.save()
+
+        return validated_data

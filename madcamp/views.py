@@ -124,3 +124,29 @@ def del_schedule(request):
         Schedule.objects.filter(id = del_id).delete()
 
         return Response(request.data, 200)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def update_travel(request):
+    if request.method == 'POST':
+        serializer = updateTravelSerializer(data=request.data)
+        
+        if not serializer.is_valid(raise_exception=True):
+            return Response(serializer.data, 409)
+        
+        serializer.save() # serializer.self.instance not initialized, so create method called instead of update method
+
+        return Response(serializer.data, 201)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def del_travel(request):
+    if request.method == 'POST':
+        print(request.data)
+        del_id = request.data
+        if del_id is None or del_id < 0 or Schedule.objects.filter(id = del_id).first() is None:
+            return Response(request.data, 409)
+        
+        Travel.objects.filter(id = del_id).delete()
+
+        return Response(request.data, 200)
