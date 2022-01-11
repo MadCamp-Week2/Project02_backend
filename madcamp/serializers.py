@@ -91,11 +91,12 @@ class TravelSerializer(serializers.Serializer):
         start_date_fd = datetime.date(validated_data['start_year'], validated_data['start_month'], validated_data['start_day'])
         end_date_fd = datetime.date(validated_data['end_year'], validated_data['end_month'], validated_data['end_day'])
 
-        travel = Travel.objects.create(title=validated_data['title'], place_name=validated_data['place_name'], start_date=start_date_fd, end_date=end_date_fd)
-        travel.save()
-
         user = User.objects.filter(email = validated_data['user_emails']).first()
-        profile = Profile.objects.get(user = user)
+        profile = Profile.objects.get(user=user)
+        
+        travel = Travel.objects.create(title=validated_data['title'], place_name=validated_data['place_name'], start_date=start_date_fd, end_date=end_date_fd)
+        travel.participants.add(profile)
+
         profile.travels.add(travel)
 
         validated_data['travel_id'] = travel.id
@@ -144,23 +145,6 @@ class newScheduleSeralizer(serializers.Serializer):
         validated_data['schedule_id'] = schedule.id
         return validated_data
 
-class getTravelSerializer(serializers.Serializer):
-    travel_id = serializers.IntegerField(required=True)
-    title = serializers.CharField(max_length=64)
-    place_name = serializers.CharField(max_length=64)
-    start_year = serializers.IntegerField()
-    start_month = serializers.IntegerField()
-    start_day = serializers.IntegerField()
-    end_year = serializers.IntegerField()
-    end_month = serializers.IntegerField()
-    end_day = serializers.IntegerField()
-    schedule_list = newScheduleSeralizer(many=True)
-
-
-class userTravelSerializer(serializers.Serializer):
-    email = serializers.EmailField(required=True)
-    travel_list = getTravelSerializer(many=True)
-
 
 class updateTravelSerializer(serializers.Serializer):
     travel_id = serializers.IntegerField(required=True)
@@ -180,14 +164,35 @@ class updateTravelSerializer(serializers.Serializer):
 
         return validated_data
 
+
 class FriendSerializer(serializers.Serializer):
     username = serializers.CharField()
     email = serializers.EmailField()
     photo = serializers.CharField()
 
+
 class getFriendsSerializer(serializers.Serializer):
     email = serializers.EmailField(required=True)
     friend_list = FriendSerializer(many=True)
+
+
+class getTravelSerializer(serializers.Serializer):
+    travel_id = serializers.IntegerField(required=True)
+    title = serializers.CharField(max_length=64)
+    place_name = serializers.CharField(max_length=64)
+    start_year = serializers.IntegerField()
+    start_month = serializers.IntegerField()
+    start_day = serializers.IntegerField()
+    end_year = serializers.IntegerField()
+    end_month = serializers.IntegerField()
+    end_day = serializers.IntegerField()
+    schedule_list = newScheduleSeralizer(many=True)
+    participant_list = FriendSerializer(many=True)
+
+
+class userTravelSerializer(serializers.Serializer):
+    email = serializers.EmailField(required=True)
+    travel_list = getTravelSerializer(many=True)
 
 class FriendRequestSerializer(serializers.Serializer):
     from_user_email = serializers.EmailField()
@@ -282,11 +287,12 @@ class TravelAddorIgnoreRequestSerializer(serializers.Serializer):
     def create(self, validated_data):
         to_user = User.objects.filter(email=validated_data['to_user_email']).first()
         to_user_profile = Profile.objects.get(user=to_user)
-        pending_travel = Travel.objects.get(id=travel_id)
+        pending_travel = Travel.objects.get(id=validated_data['travel_id'])
         
         to_user_profile.pending_travels.remove(pending_travel) #remove relation from many to many field
 
         if validated_data['status'] == 'ACCEPT':
+            pending_travel.participants.add(to_user_profile)
             to_user_profile.travels.add(pending_travel)
 
         return validated_data

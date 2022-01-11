@@ -28,6 +28,7 @@ class Travel(models.Model):
     place_name = models.CharField(max_length=50, null=True)
     start_date = models.DateField()
     end_date = models.DateField()
+    participants = models.ManyToManyField("Profile")
 
 class Schedule(models.Model):
     travel = models.ForeignKey(Travel, on_delete=models.CASCADE, null = True)

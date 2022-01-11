@@ -23,10 +23,11 @@ urlpatterns = format_suffix_patterns([
     path('travels/request/get/', views.get_travel_requests),
     path('travels/request/handle/', add_or_ignore_travel),
     path('schedules/', views.new_schedule),
+    path('schedules/get/', views.get_schedules),
     path('schedules/delete/', views.del_schedule),
     path('friends/get/', views.get_friends),
     path('friends/request/', views.post_friend_request),
     path('friends/request/get/', views.get_friend_requests),
     path('friends/request/handle/', views.add_or_ignore_friend),
-    path('friends/delete/', views.del_friend)
+    path('friends/delete/', views.del_friend),
 ])

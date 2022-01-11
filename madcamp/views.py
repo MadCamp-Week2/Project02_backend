@@ -87,9 +87,12 @@ def get_travel(request):
         # print(profile.travels.all())
         for travel in profile.travels.all():
             schedule_list = []
+            participant_list = []
             for schedule in Schedule.objects.filter(travel=travel):
                 schedule_list.append({"travel_id":travel.id, "day":schedule.day, "money":schedule.money, "memo":schedule.memo, "start_hour":schedule.start_datetime.hour, "start_minute":schedule.start_datetime.minute, "end_hour":schedule.end_datetime.hour, "end_minute":schedule.end_datetime.minute, "place_name":schedule.place.name, "place_address":schedule.place.address, "schedule_id":schedule.id})
-            travel_list.append({"travel_id":travel.id, "title":travel.title, "place_name":travel.place_name, "start_year":travel.start_date.year, "start_month":travel.start_date.month, "start_day":travel.start_date.day, "end_year":travel.end_date.year, "end_month":travel.end_date.month, "end_day":travel.end_date.day, "schedule_list":schedule_list})
+            for participant in travel.participants.all():
+                participant_list.append({"username": participant.name, "email": participant.user.email, "photo": participant.photo})
+            travel_list.append({"travel_id":travel.id, "title":travel.title, "place_name":travel.place_name, "start_year":travel.start_date.year, "start_month":travel.start_date.month, "start_day":travel.start_date.day, "end_year":travel.end_date.year, "end_month":travel.end_date.month, "end_day":travel.end_date.day, "schedule_list":schedule_list, "participant_list":participant_list})
         
         # print(travel_list)
         serializer = userTravelSerializer(data={'email':email, 'travel_list':travel_list})
@@ -252,12 +255,11 @@ def post_travel_request(request):
 def add_or_ignore_travel(request):
     if request.method == 'POST':
         serializer = TravelAddorIgnoreRequestSerializer(data=request.data)
-
+        
         if not serializer.is_valid(raise_exception=False):
             return Response(serializer.data, 409)
-
+        
         serializer.save()
-
         return Response(serializer.data, 201)
 
 @api_view(['GET'])
@@ -273,9 +275,12 @@ def get_travel_requests(request):
 
         for travel_request in Profile.objects.get(user=user).pending_travels.all():
             schedule_list = []
+            participant_list = []
             for schedule in Schedule.objects.filter(travel=travel_request):
                 schedule_list.append({"travel_id":travel_request.id, "day":schedule.day, "money":schedule.money, "memo":schedule.memo, "start_hour":schedule.start_datetime.hour, "start_minute":schedule.start_datetime.minute, "end_hour":schedule.end_datetime.hour, "end_minute":schedule.end_datetime.minute, "place_name":schedule.place.name, "place_address":schedule.place.address, "schedule_id":schedule.id})
-            travel_request_list.append({"travel_id":travel_request.id, "title":travel_request.title, "place_name":travel_request.place_name, "start_year":travel_request.start_date.year, "start_month":travel_request.start_date.month, "start_day":travel_request.start_date.day, "end_year":travel_request.end_date.year, "end_month":travel_request.end_date.month, "end_day":travel_request.end_date.day, "schedule_list":schedule_list})
+            for participant in travel_request.participants.all():
+                participant_list.append({"username": participant.name, "email": participant.user.email, "photo": participant.photo})
+            travel_request_list.append({"travel_id":travel_request.id, "title":travel_request.title, "place_name":travel_request.place_name, "start_year":travel_request.start_date.year, "start_month":travel_request.start_date.month, "start_day":travel_request.start_date.day, "end_year":travel_request.end_date.year, "end_month":travel_request.end_date.month, "end_day":travel_request.end_date.day, "schedule_list":schedule_list, "participant_list":participant_list})
 
         serializer = userTravelSerializer(data={'email':email, 'travel_list':travel_request_list})
 
@@ -283,3 +288,19 @@ def get_travel_requests(request):
             return Response(serializer.data, 409)
 
         return Response(serializer.data, 200)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_schedules(request):
+    if request.method == 'GET':
+        travel_id = int(request.query_params.get('params1',None))
+        if travel_id is None or travel_id < 0 or Travel.objects.filter(id = travel_id).first() is None:
+            return Response([], 409)
+        
+        travel = Travel.objects.get(id=travel_id)
+        
+        schedule_list = []
+        for schedule in Schedule.objects.filter(travel=travel):
+            schedule_list.append({"travel_id":travel.id, "day":schedule.day, "money":schedule.money, "memo":schedule.memo, "start_hour":schedule.start_datetime.hour, "start_minute":schedule.start_datetime.minute, "end_hour":schedule.end_datetime.hour, "end_minute":schedule.end_datetime.minute, "place_name":schedule.place.name, "place_address":schedule.place.address, "schedule_id":schedule.id})
+        
+        return Response(schedule_list, 200)
