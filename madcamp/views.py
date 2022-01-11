@@ -220,4 +220,66 @@ def add_or_ignore_friend(request):
 
         return Response(serializer.data, 201)
 
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def del_friend(request):
+    if request.method == 'POST':
+        serializer = FriendDeleteSerializer(data=request.data)
+
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+
+        serializer.save()
+
+        return Response(serializer.data, 201)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def post_travel_request(request):
+    if request.method == 'POST':
+        serializer = TravelRequestSerializer(data=request.data)
+        print(request.data)
         
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+
+        serializer.save()
+
+        return Response(serializer.data, 201)
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def add_or_ignore_travel(request):
+    if request.method == 'POST':
+        serializer = TravelAddorIgnoreRequestSerializer(data=request.data)
+
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+
+        serializer.save()
+
+        return Response(serializer.data, 201)
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_travel_requests(request):
+    if request.method == 'GET':
+        email = request.query_params.get('params1',None)
+        if email is None or User.objects.filter(email=email).first() is None:
+            return Response({'email':email, travel_list:[]}, 409)
+
+        user = User.objects.filter(email=email).first()
+        travel_request_list = []
+
+        for travel_request in Profile.objects.get(user=user).pending_travels.all():
+            schedule_list = []
+            for schedule in Schedule.objects.filter(travel=travel_request):
+                schedule_list.append({"travel_id":travel_request.id, "day":schedule.day, "money":schedule.money, "memo":schedule.memo, "start_hour":schedule.start_datetime.hour, "start_minute":schedule.start_datetime.minute, "end_hour":schedule.end_datetime.hour, "end_minute":schedule.end_datetime.minute, "place_name":schedule.place.name, "place_address":schedule.place.address, "schedule_id":schedule.id})
+            travel_request_list.append({"travel_id":travel_request.id, "title":travel_request.title, "place_name":travel_request.place_name, "start_year":travel_request.start_date.year, "start_month":travel_request.start_date.month, "start_day":travel_request.start_date.day, "end_year":travel_request.end_date.year, "end_month":travel_request.end_date.month, "end_day":travel_request.end_date.day, "schedule_list":schedule_list})
+
+        serializer = userTravelSerializer(data={'email':email, 'travel_list':travel_request_list})
+
+        if not serializer.is_valid(raise_exception=False):
+            return Response(serializer.data, 409)
+
+        return Response(serializer.data, 200)

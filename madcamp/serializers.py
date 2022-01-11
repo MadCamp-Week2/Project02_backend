@@ -199,7 +199,7 @@ class FriendRequestSerializer(serializers.Serializer):
         to_user = User.objects.filter(email=validated_data['to_user_email']).first()
         
         from_user_profile = Profile.objects.get(user=from_user)
-        print(Profile.objects.get(user=to_user).pending_requests.all())
+        # print(Profile.objects.get(user=to_user).pending_requests.all())
 
         if to_user is None:
             validated_data['status'] = 'False'
@@ -235,5 +235,58 @@ class FriendAddorIgnoreRequestSerializer(serializers.Serializer):
         if validated_data['status'] == 'ACCEPT':
             to_user_profile.friends.add(from_user_profile)
             from_user_profile.friends.add(to_user_profile)
+
+        return validated_data
+
+class FriendDeleteSerializer(serializers.Serializer):
+    from_user_email = serializers.EmailField()
+    to_user_email = serializers.EmailField()
+    status = serializers.CharField()
+
+    def create(self, validated_data):
+        from_user = User.objects.filter(email=validated_data['from_user_email']).first()
+        to_user = User.objects.filter(email=validated_data['to_user_email']).first()
+        
+        from_user_profile = Profile.objects.get(user=from_user)
+        to_user_profile = Profile.objects.get(user=to_user)
+
+        to_user_profile.friends.remove(from_user_profile)
+        from_user_profile.friends.remove(to_user_profile)
+
+        validated_data['status'] = "REMOVED"
+        
+        return validated_data
+
+class TravelRequestSerializer(serializers.Serializer):
+    from_user_email = serializers.EmailField()
+    to_user_emails = serializers.ListField(child=serializers.EmailField())
+    travel_id = serializers.IntegerField()
+
+    def create(self, validated_data):
+        from_user = User.objects.filter(email=validated_data['from_user_email']).first()
+        from_user_profile = Profile.objects.get(user=from_user)
+        request_travel = Travel.objects.get(id=validated_data['travel_id'])
+        
+        to_user_email_list = validated_data['to_user_emails']
+        for to_user_email in to_user_email_list:
+            to_user = User.objects.filter(email=to_user_email).first()
+            to_user_profile = Profile.objects.get(user=to_user)
+            to_user_profile.pending_travels.add(request_travel)
+        return validated_data
+
+class TravelAddorIgnoreRequestSerializer(serializers.Serializer):
+    to_user_email = serializers.EmailField()
+    travel_id = serializers.IntegerField()
+    status = serializers.CharField()
+
+    def create(self, validated_data):
+        to_user = User.objects.filter(email=validated_data['to_user_email']).first()
+        to_user_profile = Profile.objects.get(user=to_user)
+        pending_travel = Travel.objects.get(id=travel_id)
+        
+        to_user_profile.pending_travels.remove(pending_travel) #remove relation from many to many field
+
+        if validated_data['status'] == 'ACCEPT':
+            to_user_profile.travels.add(pending_travel)
 
         return validated_data

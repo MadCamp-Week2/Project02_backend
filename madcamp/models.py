@@ -41,9 +41,10 @@ class Schedule(models.Model):
 class Profile(models.Model):
     user = models.OneToOneField(User, on_delete=models.CASCADE, null=True)
     name = models.CharField(max_length=50, null=True)
-    travels = models.ManyToManyField(Travel, blank=True)
+    travels = models.ManyToManyField("Travel", related_name="travels_set", blank=True)
     friends = models.ManyToManyField("Profile", related_name="friends_set", blank=True)
     pending_requests = models.ManyToManyField("Profile", related_name="pending_set", blank=True)
+    pending_travels = models.ManyToManyField("Travel", related_name="pending_travels_set", blank=True)
     photo = models.CharField(blank=True, null=True, max_length=100)
 
 class Review(models.Model):
