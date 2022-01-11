@@ -17,5 +17,5 @@ Traveler는 여러 사람이 함께 여행 계획을 편리하게 짤 수 있도
 - Profile: 앱 내 유저의 프로필 정보
 > 안드로이드 클라이언트 측에서 retrofit을 통해 request를 보내면, 백엔드는 해당 request에 알맞게 데이터베이스를 수정하고, 필요 정보를 제공함.
 
-##Frontend
+## Frontend
 > Link: https://github.com/MadCamp-Week2/Project02
